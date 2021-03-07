@@ -10,7 +10,6 @@ import Data.Hashable
 import Data.UUID (UUID, fromText, toText)
 import qualified Data.UUID as UUID
 import qualified Data.UUID.V4 as UUID
-import Servant
 import System.Random
 import Test.QuickCheck
 
@@ -32,12 +31,6 @@ instance Arbitrary TodoUUID where
     let gen = mkStdGen num
         (uuid, _) = random gen
     return $ TodoUUID uuid
-
-instance ToText TodoUUID where
-  toText (TodoUUID x) = toText x
-
-instance FromText TodoUUID where
-  fromText x = TodoUUID <$> fromText x
 
 nextUUID :: MonadIO m => m TodoUUID
 nextUUID = TodoUUID <$> liftIO UUID.nextRandom
