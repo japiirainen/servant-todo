@@ -1,19 +1,12 @@
 cabal-version: 1.12
-
--- This file has been generated from package.yaml by hpack version 0.33.0.
---
--- see: https://github.com/sol/hpack
---
--- hash: 405f8833dbfd95f214cd324e15846433734b30773293c27ab55edb862e547aa4
-
 name:           servant-todo
 version:        0.1.0.0
 description:    Please see the README on GitHub at <https://github.com/githubuser/servant-todo#readme>
 homepage:       https://github.com/githubuser/servant-todo#readme
 bug-reports:    https://github.com/githubuser/servant-todo/issues
-author:         Author name here
-maintainer:     example@example.com
-copyright:      2021 Author name here
+author:         Joona Piirainen
+maintainer:     joona.piirianen@gmail.com
+copyright:      2021 Joona Piirainen
 license:        BSD3
 license-file:   LICENSE
 build-type:     Simple
@@ -22,11 +15,14 @@ extra-source-files:
 
 source-repository head
   type: git
-  location: https://github.com/githubuser/servant-todo
+  location: https://github.com/japiirainen/servant-todo
 
 library
   exposed-modules:
       Lib
+      Type.Error
+      Type.Todo
+      Type.UUID
   other-modules:
       Paths_servant_todo
   hs-source-dirs:
@@ -34,12 +30,31 @@ library
   build-depends:
       aeson
     , base >=4.7 && <5
-    , servant-server
     , wai
     , warp
+    , bytestring
+    , envy
+    , stm
+    , transformers
+    , servant
+    , either
+    , jwt
+    , random
+    , mtl
+    , servant-server
+    , servant-client
+    , servant-docs
+    , QuickCheck
+    , quickcheck-instances
+    , text
+    , time
+    , uuid
+    , http-types
+    , unordered-containers
+    , hashable
   default-language: Haskell2010
 
-executable servant-todo-exe
+executable web
   main-is: Main.hs
   other-modules:
       Paths_servant_todo
@@ -48,11 +63,29 @@ executable servant-todo-exe
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       aeson
-    , base
-    , servant-server
-    , servant-todo
+    , base >=4.7 && <5
     , wai
     , warp
+    , bytestring
+    , envy
+    , stm
+    , transformers
+    , servant
+    , either
+    , jwt
+    , random
+    , mtl
+    , servant-todo
+    , servant-server
+    , servant-docs
+    , QuickCheck
+    , quickcheck-instances
+    , text
+    , time
+    , uuid
+    , http-types
+    , unordered-containers
+    , hashable
   default-language: Haskell2010
 
 test-suite servant-todo-test
