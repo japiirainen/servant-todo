@@ -28,10 +28,8 @@ app cfg = serve (Proxy :: Proxy API) server
     where
         server :: Server API
         server enter todoToEither todoEndpoints
-
         todoToEither :: TodoApp :~> EitherT ServantErr IO
         todoToEither = Nat $ flip bimapEitherT id errorToServantErr
                              . flip runReaderT cfg . runTodo
-
         errorToServantErr :: Error ServantErr
         errorToServantErr = const err500

@@ -19,7 +19,6 @@ source-repository head
 
 library
   exposed-modules:
-      Lib
       Type.Error
       Type.Todo
       Type.UUID
@@ -29,8 +28,6 @@ library
       Config
       App
       API
-      Web.User
-      Web.Todo
       DB.User
       DB.Todo
   other-modules:
