@@ -1,5 +1,4 @@
-{-# LANGUAGE GeneralisedNewtypeDeriving #-}
-{-# OPTIONS_GHC -Wno-deferred-type-errors #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
 
 module Type.UUID where
 
@@ -7,23 +6,15 @@ import Control.Monad.IO.Class (MonadIO (..))
 import Data.Aeson
 import Data.Aeson.Types
 import Data.Hashable
-import Data.UUID (UUID, fromText, toText)
+import Data.UUID (UUID)
 import qualified Data.UUID as UUID
 import qualified Data.UUID.V4 as UUID
+import qualified Servant as S
 import System.Random
 import Test.QuickCheck
 
-newtype TodoUUID = TodoUUID UUID deriving (Show, Eq, Hashable)
-
-instance ToJSON TodoUUID where
-  toJSON = String . toText
-
-instance FromJSON TodoUUID where
-  parseJSON val@(String x) =
-    case fromText x :: Maybe TodoUUID of
-      Nothing -> typeMismatch "UUID" x
-      Just vuuid -> pure vuuid
-  parseJSON x = typeMismatch "UUID" x
+newtype TodoUUID = TodoUUID UUID
+  deriving (Show, Eq, Hashable, ToJSON, FromJSON)
 
 instance Arbitrary TodoUUID where
   arbitrary = do

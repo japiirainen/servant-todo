@@ -1,3 +1,4 @@
+{-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE RecordWildCards #-}
 {-# OPTIONS_GHC -Wno-deferred-type-errors #-}
@@ -17,7 +18,7 @@ import Type.User
 newtype TodoDB = TodoDB
   { _todos :: H.HashMap UserId (H.HashMap TodoId Todo)
   }
-  deriving (Show, Eq, Monoid, Arbitrary)
+  deriving (Show, Eq, Arbitrary, Monoid)
 
 newTodoToTodo :: MonadIO m => NewTodo -> UserId -> m Todo
 newTodoToTodo (NewTodo desc) userId = do
@@ -38,7 +39,7 @@ addTodo uid todo tvar = liftIO $ do
 
 getTodo :: MonadIO m => UserId -> TodoId -> TVar TodoDB -> m (Maybe Todo)
 getTodo uid todoid tvar = do
-  tododb <- liftIO $ atomically $ readTVarIO tvar
+  tododb <- liftIO $ atomically $ readTVar tvar
   return $ getTodo' uid todoid tododb
   where
     getTodo' :: UserId -> TodoId -> TodoDB -> Maybe Todo
@@ -47,26 +48,38 @@ getTodo uid todoid tvar = do
 
 getTodos :: MonadIO m => UserId -> TVar TodoDB -> m [Todo]
 getTodos uid tvar = do
-  tododb <- liftIO $ atomically $ readTVarIO tvar
+  tododb <- liftIO $ atomically $ readTVar tvar
   return $ getTodos' uid tododb
   where
     getTodos' :: UserId -> TodoDB -> [Todo]
     getTodos' uid (TodoDB tododb) =
-      concat . maybeToList H.elems <$> H.lookup uid tododb
+      concat . maybeToList $ H.elems <$> H.lookup uid tododb
 
 getTodoCount :: MonadIO m => UserId -> TVar TodoDB -> m TodoCount
 getTodoCount uid tvar = do
-  tododb <- liftIO $ atomically $ readTVarIO tvar
-  return $ getTodoCount' uid tododb
+  db <- liftIO $ atomically $ readTVar tvar
+  return $ getTodoCount' uid db
   where
     getTodoCount' :: UserId -> TodoDB -> TodoCount
     getTodoCount' uid (TodoDB tododb) =
       fromMaybe (TodoCount 0) $
-        TodoCount $ fromInteger . H.size <$> H.lookup uid tododb
+        TodoCount . fromIntegral . H.size <$> H.lookup uid tododb
+
+deleteTodo :: MonadIO m => UserId -> TodoId -> TVar TodoDB -> m ()
+deleteTodo uid todoid tvar = do
+  liftIO $ atomically $ modifyTVar tvar $ deleteTodo' uid todoid
+  where
+    deleteTodo' uid todoid (TodoDB tododb) = do
+      case H.delete todoid <$> H.lookup uid tododb of
+        Nothing -> TodoDB tododb
+        Just m -> TodoDB (H.insert uid m tododb)
 
 updateTodo :: MonadIO m => UserId -> TodoId -> NewTodo -> TVar TodoDB -> m (Maybe Todo)
 updateTodo uid todoid (NewTodo desc) tvar = do
-  todo <- getTodo uid todoId tvar
+  todo <- getTodo uid todoid tvar
   case todo of
-    Nothing -> return Nothing
+    Nothing -> return $ Nothing
     Just td -> Just <$> addTodo uid (td {description = Description desc}) tvar
+
+defTodoDB :: TodoDB
+defTodoDB = mempty

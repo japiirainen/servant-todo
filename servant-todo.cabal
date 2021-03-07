@@ -23,35 +23,45 @@ library
       Type.Error
       Type.Todo
       Type.UUID
+      Web.User
+      Web.Todo
+      Core
+      Config
+      App
+      API
+      Web.User
+      Web.Todo
+      DB.User
+      DB.Todo
   other-modules:
       Paths_servant_todo
   hs-source-dirs:
       src
   build-depends:
-      aeson
-    , base >=4.7 && <5
-    , wai
-    , warp
+      base >=4.7 && < 5
+    , aeson
     , bytestring
     , envy
     , stm
-    , transformers
-    , servant
-    , either
-    , jwt
     , random
     , mtl
-    , servant-server
+    , jwt
+    , transformers
+    , servant
+    , transformers-either
     , servant-client
+    , servant-server
     , servant-docs
     , QuickCheck
     , quickcheck-instances
-    , text
-    , time
-    , uuid
     , http-types
     , unordered-containers
     , hashable
+    , text
+    , time
+    , uuid
+    , wai
+    , warp
   default-language: Haskell2010
 
 executable web
